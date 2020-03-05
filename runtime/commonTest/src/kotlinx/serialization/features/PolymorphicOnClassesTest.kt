@@ -77,8 +77,10 @@ class PolymorphicOnClassesTest {
 
     @Test
     fun testDescriptor() {
-        val desc = Holder.serializer().descriptor
-        assertEquals(PolymorphicSerializer(IMessage::class).descriptor, desc.getElementDescriptor(0))
+        val polyDesc = Holder.serializer().descriptor.elementDescriptors().first()
+        assertEquals(PolymorphicSerializer(IMessage::class).descriptor, polyDesc)
+        assertEquals(2, polyDesc.elementsCount)
+        assertEquals(PrimitiveKind.STRING, polyDesc.getElementDescriptor(0).kind)
     }
 
     private fun SerialDescriptor.inContext(module: SerialModule): List<SerialDescriptor> = when (kind) {
@@ -91,7 +93,6 @@ class PolymorphicOnClassesTest {
         val polyDesc = Holder.serializer().descriptor.elementDescriptors().first() // iMessage: IMessage
 
         assertEquals(PolymorphicKind.OPEN, polyDesc.kind)
-        assertEquals(0, polyDesc.elementsCount)
 
         val inheritors = polyDesc.inContext(testModule)
         val names = listOf("SimpleMessage", "DoubleSimpleMessage", "MessageWithId").toSet()
